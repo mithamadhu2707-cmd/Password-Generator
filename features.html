@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Features | Password Generator</title>
+  <link rel="stylesheet" href="shared.css"/>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="container">
+
+      <!-- Navbar -->
+      <nav class="navbar">
+        <div class="nav-brand">🔐 SecurePass</div>
+        <div class="nav-user" id="navUser"></div>
+        <button class="nav-logout" onclick="logout()">Logout</button>
+      </nav>
+
+      <!-- Hero -->
+      <div class="hero">
+        <h2>Welcome to <span class="gradient-text">SecurePass</span></h2>
+        <p>Your personal password manager — powered by Digital Heroes</p>
+      </div>
+
+      <!-- Feature Cards -->
+      <div class="features-grid">
+
+        <div class="feature-card" onclick="goto('generator.html')">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-body">
+            <h3>Generate Password</h3>
+            <p>Create strong passwords with custom length, uppercase, lowercase, numbers & symbols</p>
+          </div>
+          <span class="feature-arrow">→</span>
+        </div>
+
+        <div class="feature-card" onclick="goto('history.html')">
+          <div class="feature-icon">📜</div>
+          <div class="feature-body">
+            <h3>Password History</h3>
+            <p>View all previously generated passwords saved securely in your device</p>
+          </div>
+          <span class="feature-arrow">→</span>
+        </div>
+
+        <div class="feature-card static">
+          <div class="feature-icon">🔔</div>
+          <div class="feature-body">
+            <h3>Notifications</h3>
+            <p>Get instant browser notification every time a password is generated</p>
+          </div>
+          <span class="feature-badge">Auto</span>
+        </div>
+
+        <div class="feature-card static">
+          <div class="feature-icon">📱</div>
+          <div class="feature-body">
+            <h3>OTP Verification</h3>
+            <p>Secure login with mobile number and one-time password authentication</p>
+          </div>
+          <span class="feature-badge">Active</span>
+        </div>
+
+        <div class="feature-card static">
+          <div class="feature-icon">📋</div>
+          <div class="feature-body">
+            <h3>One-Click Copy</h3>
+            <p>Copy any generated password to clipboard instantly with a single tap</p>
+          </div>
+          <span class="feature-badge">Easy</span>
+        </div>
+
+        <div class="feature-card static">
+          <div class="feature-icon">🛡️</div>
+          <div class="feature-body">
+            <h3>Strength Meter</h3>
+            <p>Real-time password strength analysis — Weak, Fair, Good, or Strong</p>
+          </div>
+          <span class="feature-badge">Smart</span>
+        </div>
+
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-row">
+        <button class="btn-primary big" onclick="goto('generator.html')">
+          ⚡ Start Generating Passwords
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer-brand center">
+        <div class="footer-author">
+          <span class="footer-name">Madhu</span>
+          <span class="footer-email">mithamadhu2707@gmail.com</span>
+        </div>
+        <a href="https://digitalheroesco.com" target="_blank" class="btn-heroes">
+          🦸 Built for Digital Heroes
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function goto(page) { window.location.href = page; }
+
+    function logout() {
+      localStorage.removeItem('spUser');
+      window.location.href = 'login.html';
+    }
+
+    window.onload = () => {
+      const user = JSON.parse(localStorage.getItem('spUser') || '{}');
+      if (!user.loggedIn) { window.location.href = 'login.html'; return; }
+      document.getElementById('navUser').textContent = `👤 ${user.name}`;
+      // Welcome notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          new Notification('👋 Welcome, ' + user.name + '!', {
+            body : 'You are securely logged in to SecurePass.',
+            icon : 'https://cdn-icons-png.flaticon.com/512/295/295128.png',
+            tag  : 'securepass-welcome'
+          });
+        } catch(e) {}
+      }
+    };
+  </script>
+</body>
+</html>

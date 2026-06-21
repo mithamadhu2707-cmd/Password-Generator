@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | SecurePass</title>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    /* ── Login-specific styles ── */
+    .login-steps {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 4px;
+    }
+
+    .step-dot {
+      width: 32px; height: 6px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.15);
+      margin: 0 3px;
+      transition: background 0.3s, width 0.3s;
+    }
+    .step-dot.active  { background: #a78bfa; width: 48px; }
+    .step-dot.done    { background: #22c55e; }
+
+    .step-label {
+      text-align: center;
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .step-label span {
+      color: #a78bfa;
+      font-weight: 700;
+    }
+
+    /* Form groups */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .form-input {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 13px 16px;
+      color: #fff;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      width: 100%;
+    }
+    .form-input:focus {
+      border-color: rgba(167,139,250,0.6);
+      background: rgba(167,139,250,0.05);
+    }
+    .form-input::placeholder { color: rgba(255,255,255,0.25); }
+    .form-input.error-field  { border-color: rgba(248,113,113,0.6); }
+
+    /* Phone row */
+    .phone-row {
+      display: flex;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .phone-row:focus-within {
+      border-color: rgba(167,139,250,0.6);
+    }
+    .phone-prefix {
+      padding: 13px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #a78bfa;
+      border-right: 1px solid rgba(255,255,255,0.1);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+    }
+    .phone-row input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 15px;
+      padding: 13px 14px;
+      font-family: inherit;
+    }
+
+    /* OTP boxes */
+    .otp-grid {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    .otp-box {
+      width: 50px; height: 58px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: #a78bfa;
+      background: rgba(0,0,0,0.35);
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      caret-color: #a78bfa;
+    }
+    .otp-box:focus {
+      border-color: #a78bfa;
+      background: rgba(167,139,250,0.08);
+    }
+
+    .otp-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .otp-timer { color: rgba(255,255,255,0.4); }
+
+    /* Demo OTP badge */
+    .demo-badge {
+      background: rgba(234,179,8,0.15);
+      border: 1px solid rgba(234,179,8,0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #fbbf24;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .demo-badge span {
+      font-size: 20px;
+      letter-spacing: 4px;
+      display: block;
+      margin-top: 4px;
+      color: #fff;
+    }
+
+    /* User summary (OTP step) */
+    .user-summary {
+      background: rgba(167,139,250,0.08);
+      border: 1px solid rgba(167,139,250,0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .us-row { display: flex; justify-content: space-between; align-items: center; }
+    .us-key { font-size: 12px; color: rgba(255,255,255,0.4); }
+    .us-val { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); }
+
+    /* Error */
+    .err { color: #f87171; font-size: 12px; min-height: 15px; }
+
+    /* Success overlay */
+    .success-overlay {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .success-overlay.show { display: flex; }
+    .success-icon { font-size: 64px; animation: popIn 0.4s ease; }
+    @keyframes popIn {
+      0%   { transform: scale(0.5); opacity: 0; }
+      70%  { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .success-overlay h3 { font-size: 22px; font-weight: 800; color: #fff; }
+    .success-overlay p  { font-size: 14px; color: rgba(255,255,255,0.5); }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    .shake { animation: shake 0.4s ease; }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="container small">
+
+      <!-- Logo -->
+      <div class="header">
+        <div class="lock-icon">🔐</div>
+        <h1>SecurePass</h1>
+        <p class="subtitle">Digital Heroes Password Manager</p>
+      </div>
+
+      <!-- Step Indicator -->
+      <div class="login-steps" id="stepDots">
+        <div class="step-dot active" id="dot1"></div>
+        <div class="step-dot" id="dot2"></div>
+      </div>
+      <div class="step-label" id="stepLabel"><span>Step 1</span> — Your Details</div>
+
+      <!-- ═══════════════════════════
+           STEP 1 : Details Form
+      ═══════════════════════════ -->
+      <div class="card" id="detailsStep">
+
+        <!-- Full Name -->
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input
+            type="text"
+            id="nameInput"
+            class="form-input"
+            placeholder="e.g. Thamizharasan R"
+            maxlength="50"
+            autocomplete="name"
+          />
+          <p class="err" id="nameErr"></p>
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="form-group">
+          <label class="form-label">Date of Birth</label>
+          <input
+            type="date"
+            id="dobInput"
+            class="form-input"
+            max=""
+          />
+          <p class="err" id="dobErr"></p>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input
+            type="email"
+            id="emailInput"
+            class="form-input"
+            placeholder="e.g. yourname@gmail.com"
+            maxlength="80"
+            autocomplete="email"
+          />
+          <p class="err" id="emailErr"></p>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form-group">
+          <label class="form-label">Mobile Number</label>
+          <div class="phone-row">
+            <span class="phone-prefix">🇮🇳 +91</span>
+            <input
+              type="tel"
+              id="phoneInput"
+              placeholder="98765 43210"
+              maxlength="10"
+              pattern="[0-9]{10}"
+              autocomplete="tel"
+            />
+          </div>
+          <p class="err" id="phoneErr"></p>
+        </div>
+
+        <button class="btn-primary" onclick="goToOTP()">
+          Continue &nbsp;→
+        </button>
+
+      </div>
+
+      <!-- ═══════════════════════════
+           STEP 2 : OTP Verification
+      ═══════════════════════════ -->
+      <div class="card hidden" id="otpStep">
+
+        <!-- User summary -->
+        <div class="user-summary" id="userSummary"></div>
+
+        <!-- Demo OTP badge -->
+        <div class="demo-badge" id="demoBadge">
+          Demo OTP (no SMS needed)
+          <span id="otpDisplay">------</span>
+        </div>
+
+        <!-- OTP input -->
+        <div class="form-group">
+          <label class="form-label" style="text-align:center">Enter 6-Digit OTP</label>
+          <div class="otp-grid">
+            <input class="otp-box" id="o1" maxlength="1" inputmode="numeric" oninput="otpMove(this,'o2')" onkeydown="otpBack(event,this,'o1')"/>
+            <input class="otp-box" id="o2" maxlength="1" inputmode="numeric" oninput="otpMove(this,'o3')" onkeydown="otpBack(event,this,'o1')"/>
+            <input class="otp-box" id="o3" maxlength="1" inputmode="numeric" oninput="otpMove(this,'o4')" onkeydown="otpBack(event,this,'o2')"/>
+            <input class="otp-box" id="o4" maxlength="1" inputmode="numeric" oninput="otpMove(this,'o5')" onkeydown="otpBack(event,this,'o3')"/>
+            <input class="otp-box" id="o5" maxlength="1" inputmode="numeric" oninput="otpMove(this,'o6')" onkeydown="otpBack(event,this,'o4')"/>
+            <input class="otp-box" id="o6" maxlength="1" inputmode="numeric" oninput="otpMove(this,null)"  onkeydown="otpBack(event,this,'o5')"/>
+          </div>
+          <p class="err" id="otpErr" style="text-align:center"></p>
+        </div>
+
+        <div class="otp-meta">
+          <span class="otp-timer" id="otpTimer">Expires in 60s</span>
+          <button class="link-btn" id="resendBtn" onclick="resendOTP()" disabled>Resend OTP</button>
+        </div>
+
+        <button class="btn-primary" onclick="verifyOTP()">
+          ✅ Verify & Login
+        </button>
+
+        <button class="link-btn mt" onclick="backToDetails()">← Edit Details</button>
+      </div>
+
+      <!-- ═══════════════════════════
+           SUCCESS
+      ═══════════════════════════ -->
+      <div class="card hidden" id="successStep">
+        <div class="success-overlay show">
+          <div class="success-icon">🎉</div>
+          <h3>Welcome!</h3>
+          <p id="successMsg">Redirecting to features...</p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer-brand">
+        <div class="footer-author">
+          <span class="footer-name">Madhu</span>
+          <span class="footer-email">mithamadhu2707@gmail.com</span>
+        </div>
+        <a href="https://digitalheroesco.com" target="_blank" class="btn-heroes">
+          🦸 Built for Digital Heroes
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="login.js"></script>
+</body>
+</html>

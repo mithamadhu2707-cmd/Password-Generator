@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>History | Password Generator</title>
+  <link rel="stylesheet" href="shared.css"/>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="container small">
+
+      <!-- Navbar -->
+      <nav class="navbar">
+        <button class="nav-back" onclick="window.location.href='generator.html'">← Back</button>
+        <div class="nav-brand">📜 History</div>
+        <button class="nav-logout danger" onclick="clearAll()">Clear All</button>
+      </nav>
+
+      <!-- Search -->
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search by label or password..."
+          oninput="renderHistory()"
+        />
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row" id="statsRow"></div>
+
+      <!-- History List -->
+      <div id="historyList"></div>
+
+      <!-- Empty State -->
+      <div class="empty-state hidden" id="emptyState">
+        <div class="empty-icon">📭</div>
+        <p>No passwords saved yet.</p>
+        <button class="btn-primary" onclick="window.location.href='generator.html'">
+          ⚡ Generate Now
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer-brand">
+        <div class="footer-author">
+          <span class="footer-name">Madhu</span>
+          <span class="footer-email">mithamadhu2707@gmail.com</span>
+        </div>
+        <a href="https://digitalheroesco.com" target="_blank" class="btn-heroes">
+          🦸 Built for Digital Heroes
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="history.js"></script>
+</body>
+</html>
